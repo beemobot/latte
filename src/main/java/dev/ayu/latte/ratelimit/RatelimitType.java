@@ -1,4 +1,6 @@
-public enum RatelimiterType {
+package dev.ayu.latte.ratelimit;
+
+public enum RatelimitType {
 
     GLOBAL,
     IDENTIFY;
