@@ -1,11 +1,18 @@
 plugins {
     id 'java-library'
+    id 'org.jetbrains.kotlin.jvm' version '1.7.10'
 }
+
+group 'dev.ayu.latte'
 
 allprojects {
     apply plugin: 'java-library'
-    group 'dev.ayu'
-    sourceCompatibility = JavaVersion.VERSION_17
+}
+
+kotlin {
+    jvmToolchain {
+        languageVersion.set(JavaLanguageVersion.of('17'))
+    }
 }
 
 defaultTasks 'build'
@@ -16,4 +23,6 @@ repositories {
 
 dependencies {
     implementation 'org.jetbrains:annotations:23.0.0'
+    implementation 'org.slf4j:slf4j-api:1.7.36'
+    implementation 'org.slf4j:slf4j-jdk14:1.7.36'
 }

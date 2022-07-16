@@ -4,7 +4,9 @@ import dev.ayu.latte.config.annotations.ConfiguratorIgnore;
 import dev.ayu.latte.config.annotations.ConfiguratorDefault;
 import dev.ayu.latte.config.annotations.ConfiguratorRename;
 import dev.ayu.latte.config.annotations.ConfiguratorRequired;
+import dev.ayu.latte.logging.LoggerKt;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -21,6 +23,7 @@ public class ConfiguratorImpl implements Configurator {
 
     private final Map<String, String> environments = new ConcurrentHashMap<>();
     private boolean allowDefaultToSystemEnvironment = true;
+    private static final Logger LOGGER = LoggerKt.getLogger(ConfiguratorImpl.class);
 
     /**
      * Creates a new {@link ConfiguratorImpl} with the values of
@@ -46,7 +49,8 @@ public class ConfiguratorImpl implements Configurator {
                         environments.put(array[0].toLowerCase(), array[1]);
                     });
         } catch (IOException e) {
-            Util.consoleErrorLog(e);
+            e.printStackTrace();
+            System.exit(1);
         }
     }
 
@@ -88,7 +92,7 @@ public class ConfiguratorImpl implements Configurator {
                 if (value == null && field.isAnnotationPresent(ConfiguratorDefault.class)) {
                     value = field.getAnnotation(ConfiguratorDefault.class).defaultValue();
                 } else if (value == null && !field.isAnnotationPresent(ConfiguratorDefault.class)) {
-                    Util.consoleErrorLog("Configurator failed to find a value for a field. [field=" + field.getName() + "]");
+                    LOGGER.warn("Configurator failed to find a value for a field. [field={}]", field.getName());
                 }
 
                 try {
@@ -97,7 +101,7 @@ public class ConfiguratorImpl implements Configurator {
                     // Sometimes, you may want this to be null?
                     if (value == null) {
                         if (field.isAnnotationPresent(ConfiguratorRequired.class)) {
-                            Util.consoleErrorLog(name + " was not provided during startup!");
+                            LOGGER.error("{} was not provided during startup!", name);
                             System.exit(1);
                         } else {
                             field.set(field, null);
@@ -116,26 +120,19 @@ public class ConfiguratorImpl implements Configurator {
                         } else if (adapters.containsKey(type)) {
                             field.set(field, adapters.get(type).transform(name, value, this));
                         } else {
-                            Util.consoleErrorLog(new IllegalArgumentException(
-                                    "Configurator failed to find a proper transformer or adapter for a field. " +
-                                            "Please use ConfiguratorIgnore to ignore otherwise add an adapter via Configurator.addAdapter(...). " +
-                                            "[field=" + field.getName() + "]"
-                            ));
+                            LOGGER.error("Configurator failed to find a proper transformer or adapter for a field. " +
+                                    "Please use ConfiguratorIgnore to ignore otherwise add an adapter via Configurator.addAdapter(...). [field={}]", field.getName());
                             System.exit(1);
                         }
                     }
 
                 } catch (IllegalAccessException | NumberFormatException e) {
-                    Util.consoleErrorLog(
-                            "Configurator encountered an throwable while attempting to convert a field. " +
-                                    "[field=" + field.getName() + "]"
-                    );
-                    Util.consoleErrorLog(e);
+                    LOGGER.error("Configurator encountered an throwable while attempting to convert a field. [field={}]", field.getName(), e);
                     System.exit(1);
                 }
 
             } else {
-                Util.consoleErrorLog("Configurator failed to set a field accessible. [field=" + field.getName() + "]");
+                LOGGER.error("Configurator failed to set a field accessible. [field={}]", field.getName());
                 System.exit(1);
             }
         });
