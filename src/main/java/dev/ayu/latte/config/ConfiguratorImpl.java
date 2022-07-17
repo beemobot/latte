@@ -155,7 +155,7 @@ public class ConfiguratorImpl implements Configurator {
     }
 
     /**
-     * Adds an adapter that allows {@link  Configurator} to be able to automatically
+     * Adds an adapter that allows {@link Configurator} to be able to automatically
      * transform specific environment key-pairs into the type it should be.
      *
      * @param clazz   The class that this adapter should transform.

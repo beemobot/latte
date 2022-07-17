@@ -8,7 +8,7 @@ import java.io.File;
 public interface Configurator {
 
     /**
-     * Creates a new {@link  Configurator} instance that allows the mirroring
+     * Creates a new {@link Configurator} instance that allows the mirroring
      * of environment variables onto the instance. The configuration values will
      * be read from a `.env` file in the current PWD.
      *
@@ -19,7 +19,7 @@ public interface Configurator {
     }
 
     /**
-     * Creates a new {@link  Configurator} instance that allows the mirroring
+     * Creates a new {@link Configurator} instance that allows the mirroring
      * of environment variables onto the instance.
      *
      * @param path  The path of the file containing the environment variables.
@@ -30,7 +30,7 @@ public interface Configurator {
     }
 
     /**
-     * Creates a new {@link  Configurator} instance that allows the mirroring
+     * Creates a new {@link Configurator} instance that allows the mirroring
      * of environment variables onto the instance.
      *
      * @param file  The file containing the environment variables.
@@ -41,7 +41,7 @@ public interface Configurator {
     }
 
     /**
-     * Adds an adapter that allows {@link  Configurator} to be able to automatically
+     * Adds an adapter that allows {@link Configurator} to be able to automatically
      * transform specific environment key-pairs into the type it should be.
      *
      * @param clazz     The class that this adapter should transform.
@@ -80,12 +80,12 @@ public interface Configurator {
     String get(String key);
 
     /**
-     * Enables or disables the functionality that tells {@link  Configurator} to
+     * Enables or disables the functionality that tells {@link Configurator} to
      * search through the {@link  System#getenv(String)} if the value of the key is
      * not there.
      *
      * @param allow Should we allow the defaulting functionality?
-     * @return      {@link  Configurator} for chain-calling methods.
+     * @return      {@link Configurator} for chain-calling methods.
      */
     Configurator allowDefaultToSystemEnvironment(boolean allow);
 
