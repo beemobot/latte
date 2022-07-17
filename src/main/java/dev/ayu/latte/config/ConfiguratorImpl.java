@@ -5,8 +5,8 @@ import dev.ayu.latte.config.annotations.ConfiguratorDefault;
 import dev.ayu.latte.config.annotations.ConfiguratorRename;
 import dev.ayu.latte.config.annotations.ConfiguratorRequired;
 import dev.ayu.latte.logging.LoggerKt;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
 
 import java.io.BufferedReader;
 import java.io.File;

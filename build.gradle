@@ -23,6 +23,5 @@ repositories {
 
 dependencies {
     implementation 'org.jetbrains:annotations:23.0.0'
-    implementation 'org.slf4j:slf4j-api:1.7.36'
-    implementation 'org.slf4j:slf4j-jdk14:1.7.36'
+    compileOnly 'org.apache.logging.log4j:log4j-api:2.18.0'
 }
