@@ -41,7 +41,6 @@ public interface Configurator {
      * onto the field itself, and it will ignore it.
      *
      * @throws IllegalArgumentException This happens when the field's class couldn't be mirrored, use {@link ConfiguratorAdapter}.
-     * @throws IllegalAccessException   This happens when the field is declared as unreadable.
      * @throws NumberFormatException    This happens when the field's variable cannot be convered into an integer.
      * @param toClass The class to mirror the fields.
      */
