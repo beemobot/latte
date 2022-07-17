@@ -89,10 +89,12 @@ public class ConfiguratorImpl implements Configurator {
                 }
 
                 String value = get(name);
-                if (value == null && field.isAnnotationPresent(ConfiguratorDefault.class)) {
-                    value = field.getAnnotation(ConfiguratorDefault.class).defaultValue();
-                } else if (value == null && !field.isAnnotationPresent(ConfiguratorDefault.class)) {
-                    LOGGER.warn("Configurator failed to find a value for a field. [field={}]", field.getName());
+                if (value == null) {
+                    if (field.isAnnotationPresent(ConfiguratorDefault.class)) {
+                        value = field.getAnnotation(ConfiguratorDefault.class).defaultValue();
+                    } else {
+                        LOGGER.warn("Configurator failed to find a value for a field. [field={}]", field.getName());
+                    }
                 }
 
                 try {
