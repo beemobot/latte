@@ -9,9 +9,31 @@ public interface Configurator {
 
     /**
      * Creates a new {@link  Configurator} instance that allows the mirroring
+     * of environment variables onto the instance. The configuration values will
+     * be read from a `.env` file in the current PWD.
+     *
+     * @return A new {@link Configurator} instance.
+     */
+    static Configurator create() {
+        return from(".env");
+    }
+
+    /**
+     * Creates a new {@link  Configurator} instance that allows the mirroring
      * of environment variables onto the instance.
      *
-     * @param file  The .env file location to find.
+     * @param path  The path of the file containing the environment variables.
+     * @return      A new {@link Configurator} instance.
+     */
+    static Configurator from(String path) {
+        return from(new File(path));
+    }
+
+    /**
+     * Creates a new {@link  Configurator} instance that allows the mirroring
+     * of environment variables onto the instance.
+     *
+     * @param file  The file containing the environment variables.
      * @return      A new {@link Configurator} instance.
      */
     static Configurator from(File file) {
