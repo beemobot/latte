@@ -23,3 +23,5 @@ inline val Any.log: Logger
     get() = LogManager.getLogger(unwrapCompanionClass(this::class.java))
 
 fun getLogger(clazz: Class<*>): Logger = LogManager.getLogger(clazz)
+
+fun getLogger(name: String): Logger = LogManager.getLogger(name)
