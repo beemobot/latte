@@ -26,8 +26,9 @@ data class KafkaRecordHeaders(
 
     constructor(headers: Headers) : this(
         headers.getOrDefault(HEADER_SOURCE_CLUSTER, INVALID_CLUSTER_ID.toString()).toInt(),
-        headers.getOrDefault(HEADER_TARGET_CLUSTERS, INVALID_CLUSTER_ID.toString())
+        headers.getOrDefault(HEADER_TARGET_CLUSTERS, "")
             .split(",")
+            .filter { it.isNotEmpty() }
             .map { it.toInt() }
             .toSet(),
         headers.getOrDefault(HEADER_REQUEST_ID, ""),
