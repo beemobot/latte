@@ -12,6 +12,6 @@ object SharedRatelimitData {
     const val KEY_REQUEST_GLOBAL_QUOTA = "request-global-quota"
 
     @JsonClass(generateAdapter = true)
-    class RatelimitClientData
+    class RatelimitClientData(val requestExpiresAt: Long? = null)
 
 }
