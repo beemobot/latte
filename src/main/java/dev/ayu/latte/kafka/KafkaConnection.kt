@@ -90,7 +90,7 @@ class KafkaConnection(
 
     fun start() {
         check(!isRunning) { "KafkaConnection is already running!" }
-        log.debug("Starting Kakfka Connection")
+        log.debug("Starting Kafka Connection")
         createTopics()
         createProducer()
         createConsumer()
@@ -100,7 +100,7 @@ class KafkaConnection(
             destroy()
         }, "Kafka Connection ($clientId) Shutdown Hook")
         Runtime.getRuntime().addShutdownHook(shutdownHook)
-        log.debug("Kakfka Connection is fully initialized")
+        log.debug("Kafka Connection is fully initialized")
     }
 
     fun destroy() {
