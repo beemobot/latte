@@ -195,7 +195,7 @@ class KafkaConnection(
         // "Note that exactly-once processing requires a cluster of at least three brokers by default"
         // - let's hope for the best
         props[StreamsConfig.PROCESSING_GUARANTEE_CONFIG] = StreamsConfig.EXACTLY_ONCE_V2
-        // Commit the stream process every 100ms
+        // Commit the stream progress every 100ms
         props[StreamsConfig.COMMIT_INTERVAL_MS_CONFIG] = 100
 
         val streamsBuilder = StreamsBuilder()
