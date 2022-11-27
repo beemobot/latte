@@ -143,20 +143,20 @@ class KafkaConnection(
         props[ProducerConfig.CLIENT_ID_CONFIG] = clientId
         // Require all broker replicas to have acknowledged the request
         props[ProducerConfig.ACKS_CONFIG] = "all"
-        // Reduce batch size to reduce memory usage (default buffer size is 16k which we're unlikely to ever hit)
-        props[ProducerConfig.BATCH_SIZE_CONFIG] = 1024
         // Limit time send() can block waiting for topic metadata
-        props[ProducerConfig.MAX_BLOCK_MS_CONFIG] = 2000
+        props[ProducerConfig.MAX_BLOCK_MS_CONFIG] = 30_000
         // Max time for the server to respond to a request
-        props[ProducerConfig.REQUEST_TIMEOUT_MS_CONFIG] = 2000
+        props[ProducerConfig.REQUEST_TIMEOUT_MS_CONFIG] = 10_000
         // Max time for the server to report successful delivery, including retries
-        props[ProducerConfig.DELIVERY_TIMEOUT_MS_CONFIG] = 5000
+        props[ProducerConfig.DELIVERY_TIMEOUT_MS_CONFIG] = 60_000
         // Amount of times to retry a failed request
-        props[ProducerConfig.RETRIES_CONFIG] = 2
+        props[ProducerConfig.RETRIES_CONFIG] = 10
         // Enable idempotence logic stuff
         props[ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG] = true
         // Group requests sent within the same 1 ms window into a single batch
         props[ProducerConfig.LINGER_MS_CONFIG] = 1
+        // Maximum Size of a single batch (in bytes)
+        props[ProducerConfig.BATCH_SIZE_CONFIG] = 16 * 1024
 
         producer = KafkaProducer<String, String>(props)
         log.debug("Producer has been created")
@@ -177,12 +177,14 @@ class KafkaConnection(
         // Name of this client for group management
         props[StreamsConfig.APPLICATION_ID_CONFIG] = consumerGroupId
         // Max time a task may stall and retry due to errors
-        props[StreamsConfig.TASK_TIMEOUT_MS_CONFIG] = 2000
+        props[StreamsConfig.TASK_TIMEOUT_MS_CONFIG] = 5_000
         // Max time for the server to respond to a request
-        props[StreamsConfig.REQUEST_TIMEOUT_MS_CONFIG] = 2000
+        props[StreamsConfig.REQUEST_TIMEOUT_MS_CONFIG] = 10_000
         // "Note that exactly-once processing requires a cluster of at least three brokers by default"
         // - let's hope for the best
         props[StreamsConfig.PROCESSING_GUARANTEE_CONFIG] = StreamsConfig.EXACTLY_ONCE_V2
+        // Commit the stream process every 100ms
+        props[StreamsConfig.COMMIT_INTERVAL_MS_CONFIG] = 100
 
         val streamsBuilder = StreamsBuilder()
         val source = streamsBuilder.stream<String, String>(subscribedTopics)
