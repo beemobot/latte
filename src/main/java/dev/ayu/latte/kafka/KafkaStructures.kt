@@ -59,7 +59,7 @@ data class KafkaMessage<T : Any>(
     val headers: KafkaRecordHeaders
 ) {
 
-    fun respond(data: T?) {
+    suspend fun respond(data: T?) {
         client.respond(this, data)
     }
 

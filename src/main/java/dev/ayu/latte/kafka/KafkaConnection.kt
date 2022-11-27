@@ -47,16 +47,28 @@ class KafkaConnection(
         // The `shutdownHook` is assigned a value as the last step of `start()`
         get() = shutdownHook != null
 
-    fun send(
+    suspend fun send(
         topic: String,
         key: String,
         value: String,
         headers: KafkaRecordHeaders,
+        blocking: Boolean = true,
     ): String {
         val producer = this.producer ?: throw IllegalStateException("Producer is not initialized")
         val record = ProducerRecord(topic, key, value)
         headers.applyTo(record.headers())
-        producer.send(record).get()
+
+        if (blocking) {
+            withContext(Dispatchers.IO) {
+                // This can block for up to max.block.ms while gathering metadata.
+                // The request itself will be sent async, once the metadata is fetched.
+                producer.send(record).get()
+            }
+        } else {
+            // When requesting no blocking, just throw the request into the void and hope for the best.
+            producer.send(record)
+        }
+
         // If the record is meant for ourselves (amongst other clusters),
         // immediately dispatch it to the listeners.
         if (headers.targetClusters.isEmpty() || currentClusterId in headers.targetClusters) {
@@ -144,7 +156,7 @@ class KafkaConnection(
         // Require all broker replicas to have acknowledged the request
         props[ProducerConfig.ACKS_CONFIG] = "all"
         // Limit time send() can block waiting for topic metadata
-        props[ProducerConfig.MAX_BLOCK_MS_CONFIG] = 30_000
+        props[ProducerConfig.MAX_BLOCK_MS_CONFIG] = 10_000
         // Max time for the server to respond to a request
         props[ProducerConfig.REQUEST_TIMEOUT_MS_CONFIG] = 10_000
         // Max time for the server to report successful delivery, including retries
