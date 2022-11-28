@@ -115,7 +115,11 @@ open class KafkaClient<T : Any>(
         }
     }
 
-    internal suspend fun respond(msg: KafkaMessage<T>, data: T?) {
+    internal suspend fun respond(
+        msg: KafkaMessage<T>,
+        data: T?,
+        blocking: Boolean = true,
+    ) {
         val newHeaders = KafkaRecordHeaders(
             sourceCluster = currentClusterId,
             targetClusters = setOf(msg.headers.sourceCluster),
@@ -125,6 +129,7 @@ open class KafkaClient<T : Any>(
             msg.key.toResponseKey(),
             data,
             newHeaders,
+            blocking,
         )
     }
 
