@@ -59,8 +59,8 @@ data class KafkaMessage<T : Any>(
     val headers: KafkaRecordHeaders
 ) {
 
-    fun respond(data: T?) {
-        client.respond(this, data)
+    suspend fun respond(data: T?, blocking: Boolean = true) {
+        client.respond(this, data, blocking)
     }
 
 }

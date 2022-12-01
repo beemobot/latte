@@ -1,5 +1,6 @@
 package dev.ayu.latte.util
 
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.withTimeoutOrNull
 import java.util.concurrent.atomic.AtomicInteger
@@ -18,7 +19,8 @@ class SuspendingCountDownLatch(initialCount: Int) {
 
     suspend fun countDown() {
         val newValue = counter.decrementAndGet()
-        if (newValue != 0) {
+        @OptIn(ExperimentalCoroutinesApi::class)
+        if (newValue != 0 || channel.isClosedForSend) {
             return
         }
         channel.send(Unit)

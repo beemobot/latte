@@ -37,12 +37,13 @@ open class KafkaClient<T : Any>(
         connection.on(topicName, ::onTopicRecord)
     }
 
-    protected fun send(
+    protected suspend fun send(
         key: String,
         obj: T?,
         headers: KafkaRecordHeaders = KafkaRecordHeaders(currentClusterId),
+        blocking: Boolean = true,
     ): String {
-        return connection.send(topicName, key, stringify(obj), headers)
+        return connection.send(topicName, key, stringify(obj), headers, blocking)
     }
 
     protected suspend fun sendClusterRequest(
@@ -51,6 +52,7 @@ open class KafkaClient<T : Any>(
         timeout: Duration = Duration.ZERO,
         targetClusters: Set<Int> = emptySet(),
         expectedResponses: Int? = null,
+        blocking: Boolean = true,
         messageCallback: KafkaMessageListener<T>? = null,
     ): Pair<Map<Int, KafkaMessage<T>>, Boolean> {
         val responseKey = key.toResponseKey()
@@ -80,7 +82,7 @@ open class KafkaClient<T : Any>(
         var timeoutReached = false
         try {
             requestId.set(
-                send(key, obj, KafkaRecordHeaders(currentClusterId, targetClusters))
+                send(key, obj, KafkaRecordHeaders(currentClusterId, targetClusters), blocking)
             )
 
             if (timeout <= Duration.ZERO) {
@@ -113,7 +115,11 @@ open class KafkaClient<T : Any>(
         }
     }
 
-    internal fun respond(msg: KafkaMessage<T>, data: T?) {
+    internal suspend fun respond(
+        msg: KafkaMessage<T>,
+        data: T?,
+        blocking: Boolean = true,
+    ) {
         val newHeaders = KafkaRecordHeaders(
             sourceCluster = currentClusterId,
             targetClusters = setOf(msg.headers.sourceCluster),
@@ -123,6 +129,7 @@ open class KafkaClient<T : Any>(
             msg.key.toResponseKey(),
             data,
             newHeaders,
+            blocking,
         )
     }
 
