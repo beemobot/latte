@@ -25,7 +25,7 @@ fun interface TopicListener {
 
 class KafkaConnection(
     private val kafkaHost: String,
-    private val clientId: String,
+    val clientId: String,
     private val consumerGroupId: String,
     val currentClusterId: Int,
 ) {
@@ -110,7 +110,7 @@ class KafkaConnection(
         shutdownHook = Thread({
             shutdownHook = null
             destroy()
-        }, "Kafka Connection ($clientId) Shutdown Hook")
+        }, "Kafka Connection ($consumerGroupId) Shutdown Hook")
         Runtime.getRuntime().addShutdownHook(shutdownHook)
         log.debug("Kafka Connection is fully initialized")
     }
@@ -152,7 +152,7 @@ class KafkaConnection(
         // Server to connect to
         props[ProducerConfig.BOOTSTRAP_SERVERS_CONFIG] = kafkaHost
         // Readable name of this client for debugging purposes
-        props[ProducerConfig.CLIENT_ID_CONFIG] = clientId
+        props[ProducerConfig.CLIENT_ID_CONFIG] = consumerGroupId
         // Require all broker replicas to have acknowledged the request
         props[ProducerConfig.ACKS_CONFIG] = "all"
         // Limit time send() can block waiting for topic metadata
@@ -188,6 +188,7 @@ class KafkaConnection(
         props[StreamsConfig.BOOTSTRAP_SERVERS_CONFIG] = kafkaHost
         // Name of this client for group management
         props[StreamsConfig.APPLICATION_ID_CONFIG] = consumerGroupId
+        props[StreamsConfig.CLIENT_ID_CONFIG] = consumerGroupId
         // Max time a task may stall and retry due to errors
         props[StreamsConfig.TASK_TIMEOUT_MS_CONFIG] = 5_000
         // Max time for the server to respond to a request
