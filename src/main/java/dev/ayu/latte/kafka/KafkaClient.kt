@@ -28,6 +28,9 @@ open class KafkaClient<T : Any>(
     val currentClusterId: Int
         get() = connection.currentClusterId
 
+    val clientId: String
+        get() = connection.clientId
+
     private val moshi = Moshi.Builder().build()
     private val adapter = moshi.adapter(type).nullSafe()
     private val keyListeners = Collections.synchronizedMap(HashMap<String, MutableSet<KafkaEventListener<T>>>())
@@ -40,7 +43,7 @@ open class KafkaClient<T : Any>(
     protected suspend fun send(
         key: String,
         obj: T?,
-        headers: KafkaRecordHeaders = KafkaRecordHeaders(currentClusterId),
+        headers: KafkaRecordHeaders = KafkaRecordHeaders(clientId, currentClusterId),
         blocking: Boolean = true,
     ): String {
         return connection.send(topicName, key, stringify(obj), headers, blocking)
@@ -82,7 +85,16 @@ open class KafkaClient<T : Any>(
         var timeoutReached = false
         try {
             requestId.set(
-                send(key, obj, KafkaRecordHeaders(currentClusterId, targetClusters), blocking)
+                send(
+                    key,
+                    obj,
+                    KafkaRecordHeaders(
+                        clientId,
+                        currentClusterId,
+                        targetClusters,
+                    ),
+                    blocking,
+                )
             )
 
             if (timeout <= Duration.ZERO) {
@@ -121,6 +133,7 @@ open class KafkaClient<T : Any>(
         blocking: Boolean = true,
     ) {
         val newHeaders = KafkaRecordHeaders(
+            clientId = clientId,
             sourceCluster = currentClusterId,
             targetClusters = setOf(msg.headers.sourceCluster),
             requestId = msg.headers.requestId,
